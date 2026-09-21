@@ -1,1 +1,108 @@
-temp
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Oscar 的南瓜田｜Science Quiz</title>
+<style>
+*{box-sizing:border-box} body{margin:0;background:#eef6f1;color:#173e35;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif}
+.wrap{max-width:980px;margin:auto;padding:24px} .card{background:white;border-radius:26px;padding:28px;box-shadow:0 10px 30px #183d2e18}
+h1{margin:0 0 6px;font-size:clamp(28px,5vw,44px)} .sub{color:#688078;margin-bottom:24px}
+.controls{display:grid;gap:16px} .group{padding:16px;background:#f5f8f6;border-radius:16px} .group b{display:block;margin-bottom:10px}
+label{display:inline-flex;gap:7px;align-items:center;margin:5px 14px 5px 0} select,button{font:inherit}
+select{padding:9px 12px;border:1px solid #b9c9c2;border-radius:10px;background:white}
+button{border:0;border-radius:13px;padding:12px 18px;background:#2d7a65;color:white;font-weight:700;cursor:pointer}
+button.secondary{background:#7d978e} button:disabled{opacity:.45;cursor:not-allowed}
+#quiz,#result{display:none} .meta{color:#688078;margin-bottom:14px} .q{font-size:clamp(22px,4vw,34px);line-height:1.4;margin:16px 0 22px}
+.opts{display:grid;gap:12px} .opt{text-align:left;background:#edf5f1;color:#173e35;border:2px solid transparent;font-weight:600}
+.opt:hover{border-color:#6fa38f} .opt.correct{background:#dff3e6;border-color:#4c9a69} .opt.wrong{background:#fbe3e3;border-color:#c96c6c}
+.feedback{margin-top:18px;padding:16px;border-radius:14px;background:#f3f5f4;display:none;line-height:1.6}.zhline{display:block;margin-top:7px;color:#55736a;font-size:.72em;font-weight:500}.opt .zhline{font-size:.88em;margin-top:5px}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px} .score{font-size:42px;font-weight:800;margin:10px 0}
+.small{font-size:14px;color:#71867e} .lessonOptions{display:flex;flex-wrap:wrap;gap:8px 16px}
+@media(max-width:600px){.wrap{padding:12px}.card{padding:20px;border-radius:20px}}
+</style>
+</head>
+<body><div class="wrap"><div class="card">
+<section id="setup">
+<h1>🧠 Science Quiz</h1><div class="sub">Oscar 的 Science 閱讀理解練習</div>
+<div class="controls">
+<div class="group"><b>1. 選擇範圍</b><div class="lessonOptions">
+<label><input type="checkbox" class="scope" value="Unit 5|Lesson 1" checked>Unit 5 · Lesson 1</label>
+<label><input type="checkbox" class="scope" value="Unit 5|Lesson 2" checked>Unit 5 · Lesson 2</label>
+<label><input type="checkbox" class="scope" value="Unit 5|Lesson 3" checked>Unit 5 · Lesson 3</label>
+<label><input type="checkbox" class="scope" value="Unit 6|Lesson 1" checked>Unit 6 · Lesson 1</label>
+</div></div>
+<div class="group"><b>2. 題數</b><select id="count"><option>10</option><option>15</option><option>20</option><option value="999">全部題目</option></select></div>
+<button onclick="startQuiz()">開始測驗 ▶</button>
+<div class="small">題目與選項使用英文；作答後會顯示中文解釋。題目只依照目前 Unit 5 與 Unit 6 Lesson 1 的課文內容。</div>
+</div></section>
+
+<section id="quiz">
+<div class="meta" id="meta"></div><div class="q" id="question"></div><div class="opts" id="options"></div>
+<div class="feedback" id="feedback"></div>
+<div class="nav"><button class="secondary" onclick="quitQuiz()">← 回到選擇範圍</button><button id="nextBtn" onclick="nextQuestion()" disabled>下一題 →</button></div>
+</section>
+
+<section id="result">
+<h1>🎃 完成！</h1><div class="score" id="score"></div><div id="summary"></div>
+<div class="nav"><button class="secondary" onclick="quitQuiz()">重新選擇範圍</button><button id="retryBtn" onclick="retryWrong()">錯題再練</button></div>
+</section>
+</div></div>
+<script>
+const BANK=[{"unit": "Unit 5", "lesson": "Lesson 1", "q": "Why are leatherback sea turtles called “leatherback” turtles?", "opts": ["They live on leather-colored beaches.", "They have soft, leathery shells.", "They eat leathery plants.", "Their flippers feel like leather."], "a": 1, "zh": "因為牠們有柔軟、像皮革一樣的龜殼。"}, {"unit": "Unit 5", "lesson": "Lesson 1", "q": "Why do mother leatherback sea turtles return to the beach?", "opts": ["To find food.", "To hide from predators.", "To lay their eggs.", "To warm their shells."], "a": 2, "zh": "母海龜回到海灘是為了產卵。"}, {"unit": "Unit 5", "lesson": "Lesson 1", "q": "What do baby leatherback turtles do after their eggs hatch?", "opts": ["They crawl toward the ocean.", "They stay in the nest for a year.", "They follow their mother.", "They climb trees."], "a": 0, "zh": "蛋孵化後，小海龜會朝海洋爬去。"}, {"unit": "Unit 5", "lesson": "Lesson 1", "q": "What is an organism?", "opts": ["Only an animal", "Only a plant", "A living thing", "A kind of rock"], "a": 2, "zh": "organism 是「生物」，也就是有生命的東西。"}, {"unit": "Unit 5", "lesson": "Lesson 1", "q": "Why do living things reproduce?", "opts": ["So their kind can continue to live on Earth.", "So they can change into another species.", "So they never grow old.", "So they can stop needing food."], "a": 0, "zh": "生物繁殖，能讓自己的種類繼續生存在地球上。"}, {"unit": "Unit 5", "lesson": "Lesson 1", "q": "Which conditions does a seed need to sprout?", "opts": ["Air, the right temperature, and the right amount of water", "Only bright sunlight", "Cold air and no water", "Salt water and darkness"], "a": 0, "zh": "種子需要空氣、適當溫度和適量的水才能發芽。"}, {"unit": "Unit 5", "lesson": "Lesson 1", "q": "What does a young plant use when it first starts to grow?", "opts": ["Food stored in the seed", "Food from animals", "Sand stored in the seed", "Only sunlight"], "a": 0, "zh": "小植物剛開始生長時，會使用種子裡儲存的養分。"}, {"unit": "Unit 5", "lesson": "Lesson 1", "q": "Why does a bird egg have a hard covering?", "opts": ["To make it heavier", "To protect the young bird inside", "To help it swim", "To attract predators"], "a": 1, "zh": "鳥蛋的硬殼可以保護裡面的幼鳥。"}, {"unit": "Unit 5", "lesson": "Lesson 1", "q": "What pattern is shared by the life cycles of all organisms?", "opts": ["Begin life, grow, reproduce, and die", "Hatch, fly, reproduce, and sleep", "Grow, change species, and live forever", "Begin life, reproduce immediately, and stop growing"], "a": 0, "zh": "所有生物共同的生命週期模式是：開始生命、成長、繁殖、死亡。"}, {"unit": "Unit 5", "lesson": "Lesson 2", "q": "What is a trait?", "opts": ["A place where an organism lives", "A feature of an organism", "A stage of the weather", "A kind of food"], "a": 1, "zh": "trait 是生物的「特徵」，可以是外觀、身體運作方式或行為。"}, {"unit": "Unit 5", "lesson": "Lesson 2", "q": "What does it mean to inherit a trait?", "opts": ["To learn it at school", "To get it from parents or ancestors", "To choose it yourself", "To lose it as you grow"], "a": 1, "zh": "inherit 指從父母或祖先那裡得到特徵。"}, {"unit": "Unit 5", "lesson": "Lesson 2", "q": "Why can puppies from the same parents look a little different?", "opts": ["Because offspring can have variation", "Because they are different species", "Because traits are never inherited", "Because all puppies change color every day"], "a": 0, "zh": "同一親代的後代仍可能有差異，這叫 variation（變異）。"}, {"unit": "Unit 5", "lesson": "Lesson 2", "q": "Which is an example of variation among plants of the same kind?", "opts": ["Different flower colors", "One is a plant and one is an animal", "One lives and one is a rock", "All have exactly the same traits"], "a": 0, "zh": "同一種類植物可能有不同花色，這就是特徵上的變異。"}, {"unit": "Unit 5", "lesson": "Lesson 2", "q": "How can camouflage help prey animals?", "opts": ["It helps them avoid being eaten.", "It makes them grow faster.", "It changes them into predators.", "It gives them more food."], "a": 0, "zh": "獵物利用偽裝融入環境，可以降低被掠食者發現、吃掉的機會。"}, {"unit": "Unit 5", "lesson": "Lesson 2", "q": "What unusual trait does the platypus have?", "opts": ["It is a mammal that lays eggs.", "It is a bird that gives live birth.", "It has no bones.", "It is cold-blooded."], "a": 0, "zh": "鴨嘴獸很特別，因為牠是會產卵的哺乳類動物。"}, {"unit": "Unit 5", "lesson": "Lesson 2", "q": "Which other mammals lay eggs according to the lesson?", "opts": ["Elephants", "Echidnas", "Polar bears", "Whales"], "a": 1, "zh": "課文指出，除了鴨嘴獸之外，針鼴（echidnas）也會產卵。"}, {"unit": "Unit 5", "lesson": "Lesson 3", "q": "What can cause a saguaro cactus to form more branches?", "opts": ["More water in the environment", "Less air", "More predators", "Less soil"], "a": 0, "zh": "研究發現，環境中的水分較多時，巨人柱仙人掌會形成更多分枝。"}, {"unit": "Unit 5", "lesson": "Lesson 3", "q": "Which statement about inherited traits and the environment is true?", "opts": ["Only inherited traits affect organisms.", "Only the environment affects organisms.", "The environment can influence inherited traits.", "The environment never affects plant traits."], "a": 2, "zh": "課文說明環境可以 influence（影響）遺傳特徵的表現。"}, {"unit": "Unit 5", "lesson": "Lesson 3", "q": "What can affect the color of hydrangea flowers?", "opts": ["The kind of soil", "The number of birds nearby", "The shape of the pot only", "The age of nearby animals"], "a": 0, "zh": "繡球花的花色可能是藍色或粉紅色，取決於植物生長的土壤種類。"}, {"unit": "Unit 5", "lesson": "Lesson 3", "q": "What happened to the plant that did not get enough sunlight?", "opts": ["It showed a different growth pattern.", "It became an animal.", "It immediately produced more flowers.", "It stopped being a living thing."], "a": 0, "zh": "課文用植物照片說明：陽光量會影響植物的生長特徵。"}, {"unit": "Unit 6", "lesson": "Lesson 1", "q": "What is an adaptation?", "opts": ["A trait that helps an organism survive, find mates, or reproduce", "A place where an organism sleeps", "A stage in every animal's life cycle", "A type of soil"], "a": 0, "zh": "adaptation 是能幫助生物生存、找到配偶或繁殖的特徵。"}, {"unit": "Unit 6", "lesson": "Lesson 1", "q": "According to the lesson, what can a saguaro cactus with more arms do?", "opts": ["Produce more offspring", "Move to a colder habitat", "Dig holes in sand", "Grow fur"], "a": 0, "zh": "課文指出，擁有更多分枝（arms）的巨人柱仙人掌可以產生更多後代。"}, {"unit": "Unit 6", "lesson": "Lesson 1", "q": "What is a habitat?", "opts": ["A certain kind of place where a living thing is adapted to live", "A trait inherited only by animals", "A kind of offspring", "A way to reproduce"], "a": 0, "zh": "habitat 是生物適應生活的棲息環境。"}, {"unit": "Unit 6", "lesson": "Lesson 1", "q": "How do hairs help some plants in cold parts of Earth?", "opts": ["They keep the plants warm.", "They help the plants swim.", "They attract predators.", "They turn the plants blue."], "a": 0, "zh": "課文指出，有些寒冷地區植物表面的毛可以幫助保暖。"}, {"unit": "Unit 6", "lesson": "Lesson 1", "q": "Why does a sandfish lizard dig holes in the sand?", "opts": ["To avoid predators", "To grow more arms", "To attract female widowbirds", "To make the Arctic warmer"], "a": 0, "zh": "沙魚蜥蜴會鑽進沙裡來躲避掠食者。"}, {"unit": "Unit 6", "lesson": "Lesson 1", "q": "Why would the sandfish lizard not survive in the Arctic, according to the lesson?", "opts": ["There is no sand there.", "There are too many flowers.", "It cannot reproduce in cold water.", "There are no other animals."], "a": 0, "zh": "課文的理由是北極沒有沙，因此沙魚蜥蜴無法使用鑽沙的適應方式。"}, {"unit": "Unit 6", "lesson": "Lesson 1", "q": "What is a species?", "opts": ["A group of living things of the same kind", "All living things on Earth", "A group of different habitats", "Only plants of the same color"], "a": 0, "zh": "species 是「同一種類的一群生物」。"}, {"unit": "Unit 6", "lesson": "Lesson 1", "q": "Why is an individual with helpful mating traits more likely to have offspring?", "opts": ["It may be better able to attract mates.", "It never needs food.", "It becomes a different species.", "It can live without a habitat."], "a": 0, "zh": "有助於吸引配偶的特徵，會讓個體更可能找到配偶並產生後代。"}, {"unit": "Unit 6", "lesson": "Lesson 1", "q": "Which male widowbirds attract more females for mating?", "opts": ["Those with longer tails", "Those with shorter tails", "Those with no tails", "All attract exactly the same number"], "a": 0, "zh": "課文舉例：尾巴較長的雄性 widowbirds 會吸引更多雌鳥。"}];
+const ZH={"Why are leatherback sea turtles called “leatherback” turtles?": ["為什麼革龜被稱為「leatherback」海龜？", ["牠們生活在皮革色的海灘。", "牠們有柔軟、像皮革一樣的龜殼。", "牠們吃像皮革一樣的植物。", "牠們的鰭摸起來像皮革。"]], "Why do mother leatherback sea turtles return to the beach?": ["為什麼母革龜會回到海灘？", ["尋找食物。", "躲避掠食者。", "產卵。", "讓龜殼變暖。"]], "What do baby leatherback turtles do after their eggs hatch?": ["革龜寶寶孵化後會做什麼？", ["朝海洋爬去。", "在巢裡待一年。", "跟著媽媽。", "爬樹。"]], "What is an organism?": ["什麼是 organism（生物）？", ["只有動物。", "只有植物。", "有生命的東西。", "一種岩石。"]], "Why do living things reproduce?": ["為什麼生物要繁殖？", ["讓自己的種類能繼續生存在地球上。", "讓自己變成另一個物種。", "讓自己永遠不會老。", "讓自己不再需要食物。"]], "Which conditions does a seed need to sprout?": ["種子需要哪些條件才能發芽？", ["空氣、適當的溫度和適量的水。", "只有明亮的陽光。", "冷空氣而且沒有水。", "鹽水和黑暗。"]], "What does a young plant use when it first starts to grow?": ["幼小植物剛開始生長時會使用什麼？", ["種子裡儲存的養分。", "動物提供的食物。", "種子裡儲存的沙。", "只有陽光。"]], "Why does a bird egg have a hard covering?": ["為什麼鳥蛋有堅硬的外殼？", ["讓蛋更重。", "保護裡面的幼鳥。", "幫助蛋游泳。", "吸引掠食者。"]], "What pattern is shared by the life cycles of all organisms?": ["所有生物的生命週期都有什麼共同模式？", ["開始生命、成長、繁殖、死亡。", "孵化、飛行、繁殖、睡覺。", "成長、改變物種、永遠活著。", "開始生命、立刻繁殖、停止成長。"]], "What is a trait?": ["什麼是 trait（特徵）？", ["生物居住的地方。", "生物的一種特徵。", "天氣的一個階段。", "一種食物。"]], "What does it mean to inherit a trait?": ["inherit a trait 是什麼意思？", ["在學校學到它。", "從父母或祖先得到它。", "自己選擇它。", "長大後失去它。"]], "Why can puppies from the same parents look a little different?": ["為什麼同一對親代的小狗可能看起來有些不同？", ["因為後代可能有變異。", "因為牠們是不同物種。", "因為特徵永遠不會遺傳。", "因為所有小狗每天都會變色。"]], "Which is an example of variation among plants of the same kind?": ["哪一項是同一種類植物之間的 variation（變異）？", ["不同的花朵顏色。", "一個是植物、一個是動物。", "一個有生命、一個是岩石。", "所有特徵完全相同。"]], "How can camouflage help prey animals?": ["偽裝如何幫助獵物？", ["幫助牠們避免被吃掉。", "讓牠們長得更快。", "讓牠們變成掠食者。", "讓牠們得到更多食物。"]], "What unusual trait does the platypus have?": ["鴨嘴獸有什麼不尋常的特徵？", ["牠是會產卵的哺乳類動物。", "牠是直接生下幼體的鳥。", "牠沒有骨骼。", "牠是冷血動物。"]], "Which other mammals lay eggs according to the lesson?": ["根據課文，還有哪些哺乳類動物會產卵？", ["大象。", "針鼴。", "北極熊。", "鯨魚。"]], "What can cause a saguaro cactus to form more branches?": ["什麼會讓巨人柱仙人掌形成更多分枝？", ["環境中有更多水分。", "較少空氣。", "更多掠食者。", "較少土壤。"]], "Which statement about inherited traits and the environment is true?": ["關於遺傳特徵與環境，哪個敘述正確？", ["只有遺傳特徵會影響生物。", "只有環境會影響生物。", "環境可以影響遺傳特徵。", "環境從不影響植物特徵。"]], "What can affect the color of hydrangea flowers?": ["什麼會影響繡球花的花色？", ["土壤的種類。", "附近鳥類的數量。", "只有花盆的形狀。", "附近動物的年齡。"]], "What happened to the plant that did not get enough sunlight?": ["沒有得到足夠陽光的植物發生了什麼？", ["呈現不同的生長情形。", "變成動物。", "立刻長出更多花。", "不再是生物。"]], "What is an adaptation?": ["什麼是 adaptation（適應特徵）？", ["幫助生物生存、找到配偶或繁殖的特徵。", "生物睡覺的地方。", "每種動物生命週期的一個階段。", "一種土壤。"]], "According to the lesson, what can a saguaro cactus with more arms do?": ["根據課文，擁有更多分枝的巨人柱仙人掌可以做什麼？", ["產生更多後代。", "移到更寒冷的棲地。", "在沙中挖洞。", "長出毛。"]], "What is a habitat?": ["什麼是 habitat（棲地）？", ["生物適應生活的特定環境。", "只有動物才會遺傳的特徵。", "一種後代。", "一種繁殖方式。"]], "How do hairs help some plants in cold parts of Earth?": ["細毛如何幫助地球寒冷地區的某些植物？", ["幫助植物保暖。", "幫助植物游泳。", "吸引掠食者。", "讓植物變成藍色。"]], "Why does a sandfish lizard dig holes in the sand?": ["為什麼沙魚蜥會在沙中挖洞？", ["躲避掠食者。", "長出更多分枝。", "吸引雌性寡婦鳥。", "讓北極變暖。"]], "Why would the sandfish lizard not survive in the Arctic, according to the lesson?": ["根據課文，為什麼沙魚蜥無法在北極生存？", ["那裡沒有沙。", "那裡有太多花。", "牠無法在冷水中繁殖。", "那裡沒有其他動物。"]], "What is a species?": ["什麼是 species（物種）？", ["同一種類的一群生物。", "地球上所有的生物。", "一群不同的棲地。", "只有相同顏色的植物。"]], "Why is an individual with helpful mating traits more likely to have offspring?": ["為什麼具有有利求偶特徵的個體更可能產生後代？", ["牠可能更能吸引配偶。", "牠永遠不需要食物。", "牠會變成不同物種。", "牠可以不需要棲地而生活。"]], "Which male widowbirds attract more females for mating?": ["哪一種雄性寡婦鳥能吸引更多雌鳥交配？", ["尾巴較長的。", "尾巴較短的。", "沒有尾巴的。", "全部吸引完全相同數量的雌鳥。"]]};
+let quiz=[], idx=0, correct=0, wrong=[], answered=false, attempts=0;
+const $=id=>document.getElementById(id);
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startQuiz(){
+ const scopes=[...document.querySelectorAll('.scope:checked')].map(x=>x.value);
+ if(!scopes.length){alert('請至少選一個 Lesson！');return}
+ let pool=BANK.filter(q=>scopes.includes(q.unit+'|'+q.lesson));
+ let n=Math.min(parseInt($('count').value),pool.length);
+ quiz=shuffle(pool).slice(0,n); idx=0;correct=0;wrong=[];
+ $('setup').style.display='none';$('result').style.display='none';$('quiz').style.display='block';show();
+}
+function show(){
+ answered=false;attempts=0;$('nextBtn').disabled=true;$('feedback').style.display='none';
+ const q=quiz[idx];$('meta').textContent=`${q.unit} · ${q.lesson}　｜　第 ${idx+1} / ${quiz.length} 題`;
+ $('question').textContent=q.q; const box=$('options');box.innerHTML='';
+ q.opts.forEach((o,i)=>{let b=document.createElement('button');b.className='opt';b.textContent=String.fromCharCode(65+i)+'. '+o;b.onclick=()=>answer(i,b);box.appendChild(b)})
+}
+function answer(i,b){
+ if(answered)return;
+ const q=quiz[idx], buttons=[...document.querySelectorAll('.opt')];
+ if(i===q.a){
+   answered=true; buttons[q.a].classList.add('correct'); correct++;
+   $('feedback').innerHTML='<b>✅ Correct!</b><br>'+q.zh;
+   $('feedback').style.display='block'; $('nextBtn').disabled=false;
+   $('nextBtn').textContent=idx===quiz.length-1?'看結果 →':'下一題 →'; return;
+ }
+ attempts++;
+ b.classList.add('wrong');
+ if(attempts===1){
+   const z=ZH[q.q];
+   // Put Chinese directly beneath the English question and each option.
+   $('question').innerHTML=q.q+'<span class="zhline">'+z[0]+'</span>';
+   buttons.forEach((btn,n)=>{
+     const letter=String.fromCharCode(65+n);
+     btn.innerHTML=letter+'. '+q.opts[n]+'<span class="zhline">'+letter+'. '+z[1][n]+'</span>';
+   });
+   $('feedback').innerHTML='<b>❌ 第一次答錯，再看中文意思後試一次！</b>';
+   $('feedback').style.display='block';
+   setTimeout(()=>b.classList.remove('wrong'),450);
+ } else {
+   answered=true; buttons[q.a].classList.add('correct');
+   if(!wrong.includes(q)) wrong.push(q);
+   $('feedback').innerHTML='<b>❌ 第二次答錯</b><br>正確答案是 <b>'+String.fromCharCode(65+q.a)+'. '+q.opts[q.a]+'</b><br>'+q.zh;
+   $('feedback').style.display='block'; $('nextBtn').disabled=false;
+   $('nextBtn').textContent=idx===quiz.length-1?'看結果 →':'下一題 →';
+ }
+}
+function nextQuestion(){if(!answered)return;if(++idx<quiz.length)show();else finish()}
+function finish(){$('quiz').style.display='none';$('result').style.display='block';let pct=Math.round(correct/quiz.length*100);
+ $('score').textContent=`${correct} / ${quiz.length}　(${pct}%)`;
+ $('summary').innerHTML=wrong.length?`這次有 <b>${wrong.length}</b> 題可以再練一次。`:'全部答對！🌟';
+ $('retryBtn').style.display=wrong.length?'inline-block':'none';
+}
+function retryWrong(){quiz=shuffle(wrong);idx=0;correct=0;wrong=[];$('result').style.display='none';$('quiz').style.display='block';show()}
+function quitQuiz(){$('quiz').style.display='none';$('result').style.display='none';$('setup').style.display='block'}
+</script></body></html>
