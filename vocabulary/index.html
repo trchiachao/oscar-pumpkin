@@ -1,1 +1,71 @@
-a
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vocabulary｜Oscar的南瓜田</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(#fff9ed,#fff0ce);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#39291d}
+.wrap{max-width:980px;margin:auto;padding:20px}.card{background:#fff;border:3px solid #e6b354;border-radius:26px;padding:24px;box-shadow:0 10px 28px #76501c20}
+.brand{text-align:center;font-size:34px;font-weight:900}.sub{text-align:center;color:#80684e;margin:5px 0 20px}
+.back{display:inline-block;text-decoration:none;color:#765c3d;font-weight:900;margin-bottom:12px}
+.range{background:#fff9ed;border:2px dashed #e6b354;border-radius:18px;padding:18px;margin:10px 0 18px}
+.range h2{text-align:center;margin:0 0 14px;font-size:22px}
+.checks{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;max-width:760px;margin:auto}
+.check{display:flex;align-items:center;gap:7px;background:#fff;border:2px solid #efd7a3;border-radius:12px;padding:11px;font-weight:800}
+.check input{width:20px;height:20px}
+.actions{text-align:center;margin-top:15px}.orange,.action{border:0;border-radius:15px;padding:14px 20px;background:#f2a23a;font-weight:900;box-shadow:0 3px 0 #c87d1f;cursor:pointer;margin:4px}
+.count{font-size:17px;padding:10px;border-radius:10px;border:2px solid #d5b36c}
+.small{text-align:center;color:#80684e;font-size:14px}.game,.result{display:none}.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#765c3d;font-weight:800}
+.meaning{text-align:center;font-size:25px;font-weight:900;margin:20px 0 8px}.listen{display:block;margin:10px auto;border:0;border-radius:999px;background:#f2a23a;padding:13px 22px;font-size:19px;font-weight:900;cursor:pointer}
+.answerBox{display:none;text-align:center;background:#fff0b8;border-radius:14px;padding:12px;margin:10px auto;max-width:600px}.answer{font-size:32px;font-weight:900;letter-spacing:2px}
+.slots{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;min-height:55px;margin:17px 0 23px}.slot{width:36px;height:45px;border-bottom:4px solid #604a37;text-align:center;font-size:30px;font-weight:900}
+.keyboard{display:flex;flex-direction:column;gap:10px;max-width:850px;margin:auto}.keyrow{display:flex;gap:8px;justify-content:center}.keyrow:nth-child(2){padding:0 3%}.keyrow:nth-child(3){padding:0 10%}
+.key{flex:1;max-width:74px;min-width:48px;border:0;border-radius:12px;background:#fff0c7;padding:15px 4px;font-size:20px;font-weight:900;box-shadow:0 2px 0 #d7bb7a;cursor:pointer}
+.controls{text-align:center;margin-top:14px}.controls button{border:0;border-radius:13px;padding:12px 20px;margin:0 5px;font-weight:900;cursor:pointer}.del{background:#eee}.submit{background:#79c267}
+.msg{text-align:center;min-height:32px;margin-top:12px;font-size:19px;font-weight:900}.result{text-align:center}.wrongList{max-width:650px;margin:15px auto;text-align:left;background:#fff8e9;border-radius:15px;padding:16px}
+@media(max-width:650px){.wrap{padding:10px}.card{padding:15px}.checks{grid-template-columns:repeat(2,1fr)}.brand{font-size:28px}.keyrow{gap:4px}.key{min-width:0;max-width:none;padding:13px 2px;font-size:17px}.slot{width:29px;font-size:26px}.meaning{font-size:21px}}
+</style>
+</head>
+<body><div class="wrap"><div class="card">
+<section id="home">
+<a class="back" href="../">← 回到南瓜田</a>
+<div class="brand">🔤<br>Vocabulary</div>
+<div class="sub">選擇要複習的 Lesson 範圍</div>
+<div class="range">
+<h2>選擇 Lesson</h2>
+<div class="checks" id="checks"></div>
+<div class="actions">
+<button class="action" id="all">全選</button><button class="action" id="none">清除</button>
+</div>
+<div class="actions"><label><b>題數：</b></label> <select class="count" id="count"></select> <button class="orange" id="startBtn">開始複習</button></div>
+<p class="small">可以只選一課，也可以同時選多課。題目會從勾選的 Lesson 中隨機抽出。</p>
+</div>
+<p class="small">錯題會自動留下來複習；同一題錯 3 次會顯示答案，照著正確答案拼一次後才繼續。</p>
+</section>
+<section class="game" id="game"><div class="top"><span id="round"></span><span id="progress"></span><span id="wrongN"></span></div><div class="meaning" id="meaning"></div><button class="listen" id="listen">🔊 再聽一次</button><div class="answerBox" id="answerBox">正確答案<div class="answer" id="answer"></div><small>請看著答案，再完整輸入一次</small></div><div class="slots" id="slots"></div><div class="keyboard" id="keyboard"></div><div class="controls"><button class="del" id="del">⌫ 刪除</button><button class="submit" id="submit">✓ 送出</button></div><div class="msg" id="msg"></div></section>
+<section class="result" id="result"><h2 id="rtitle"></h2><div id="rtext"></div><div class="wrongList" id="wrongList"></div><button class="action" id="again"></button><button class="action" id="homeBtn">回 Vocabulary</button></section>
+</div></div>
+<script>
+const lessons={"1": [{"w": "webbed", "zh": "有蹼的"}, {"w": "waterproof", "zh": "防水的"}, {"w": "steer", "zh": "駕駛；操控；引導"}, {"w": "whistle", "zh": "吹口哨；哨子"}, {"w": "otherwise", "zh": "否則；不然；在其他方面"}, {"w": "junior", "zh": "年幼的；低年級的；晚輩"}, {"w": "slippery", "zh": "滑的；濕滑的"}, {"w": "finally", "zh": "最後；終於"}, {"w": "feathers", "zh": "羽毛"}, {"w": "scientist", "zh": "科學家"}], "2": [{"w": "cell", "zh": "細胞；小隔間"}, {"w": "leaf", "zh": "葉子；樹葉"}, {"w": "nutrient", "zh": "養分；營養素"}, {"w": "plant", "zh": "植物；種植"}, {"w": "root", "zh": "根；根部"}, {"w": "stem", "zh": "莖；梗"}, {"w": "rookery", "zh": "鳥類繁殖地；群棲地"}, {"w": "flippers", "zh": "鰭狀肢；腳蹼"}, {"w": "swallow", "zh": "吞下；燕子"}, {"w": "hatch", "zh": "孵化；孵出"}], "3": [{"w": "knot", "zh": "結；打結"}, {"w": "copy", "zh": "複製；抄寫；副本"}, {"w": "planning", "zh": "計畫；規劃"}, {"w": "lonely", "zh": "孤單的；寂寞的"}, {"w": "heavily", "zh": "大量地；沉重地"}, {"w": "seriously", "zh": "認真地；嚴重地"}, {"w": "answered", "zh": "回答了"}, {"w": "guessed", "zh": "猜了；猜測了"}, {"w": "tracing", "zh": "描摹；追蹤"}, {"w": "soaking", "zh": "浸泡；濕透的"}], "4": [{"w": "environment", "zh": "環境"}, {"w": "reproduce", "zh": "繁殖；複製；再現"}, {"w": "netted", "zh": "用網捕捉；網住"}, {"w": "parallel", "zh": "平行的；平行線"}, {"w": "veins", "zh": "葉脈；血管"}, {"w": "branch", "zh": "樹枝；分支"}, {"w": "voice", "zh": "聲音；嗓音"}, {"w": "practice", "zh": "練習；實踐"}, {"w": "garage", "zh": "車庫"}, {"w": "closet", "zh": "壁櫥；衣櫃"}], "5": [{"w": "yarn", "zh": "紗線；毛線"}, {"w": "strands", "zh": "股；縷；線束"}, {"w": "spinning", "zh": "紡紗；旋轉"}, {"w": "dye", "zh": "染料；染色"}, {"w": "weave", "zh": "編織"}, {"w": "sharpen", "zh": "削尖；使鋒利"}, {"w": "duplicated", "zh": "複製了；重複的"}, {"w": "delicious", "zh": "美味的；好吃的"}, {"w": "practice", "zh": "練習；實踐"}, {"w": "appear", "zh": "出現；看起來"}], "6": [{"w": "trouble", "zh": "麻煩；困難"}, {"w": "picnic", "zh": "野餐"}, {"w": "collected", "zh": "收集了；蒐集了"}, {"w": "wondering", "zh": "想知道；納悶"}, {"w": "hundreds", "zh": "數百；好幾百"}, {"w": "mammal", "zh": "哺乳類動物"}, {"w": "bird", "zh": "鳥；鳥類"}, {"w": "reptile", "zh": "爬蟲類動物"}, {"w": "fish", "zh": "魚；魚類"}, {"w": "amphibian", "zh": "兩棲類動物"}], "7": [{"w": "tumbling", "zh": "翻滾；滾落"}, {"w": "flung", "zh": "猛丟；甩出"}, {"w": "tangled", "zh": "纏結的；糾纏的"}, {"w": "empty", "zh": "空的；空無一物的"}, {"w": "swift", "zh": "快速的；迅速的"}, {"w": "peacefully", "zh": "平靜地；和平地"}, {"w": "stream", "zh": "溪流；小河；流動"}, {"w": "blazed", "zh": "燃燒；閃耀"}, {"w": "separate", "zh": "分開；分離的"}, {"w": "bother", "zh": "打擾；麻煩"}], "8": [{"w": "ordinary", "zh": "普通的；平凡的"}, {"w": "special", "zh": "特別的；特殊的"}, {"w": "surrounded", "zh": "被包圍；圍繞"}, {"w": "attention", "zh": "注意；注意力"}, {"w": "overheard", "zh": "無意中聽到；偶然聽見"}, {"w": "enormous", "zh": "巨大的；龐大的"}, {"w": "palace", "zh": "宮殿"}, {"w": "fancy", "zh": "華麗的；精緻的；喜歡"}, {"w": "guard", "zh": "守衛；保護"}, {"w": "uniform", "zh": "制服；一致的"}]};
+const $=x=>document.getElementById(x),shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let q=[],i=0,round=1,wrong=new Map(),typed="",tries=0,copy=false,cur=null,label="";
+function speak(){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(cur.w);u.lang="en-US";u.rate=.78;speechSynthesis.speak(u)}
+function slots(){$("slots").innerHTML="";[...cur.w].forEach((_,n)=>{let d=document.createElement("div");d.className="slot";d.textContent=(typed[n]||"").toUpperCase();$("slots").appendChild(d)})}
+function add(c){if(typed.length<cur.w.length){typed+=c.toLowerCase();slots()}}
+function show(){cur=q[i];typed="";tries=0;copy=false;$("answerBox").style.display="none";$("msg").textContent="";$("meaning").textContent="中文："+cur.zh;$("round").textContent=label+"｜第 "+round+" 輪";$("progress").textContent=`第 ${i+1} / ${q.length} 題`;$("wrongN").textContent=`本輪錯題 ${wrong.size}`;slots();setTimeout(speak,250)}
+function submit(){if(typed.length!==cur.w.length){$("msg").textContent="還沒拼完喔！";return}if(typed===cur.w){$("msg").textContent=copy?"✓ 很好！已照著正確答案拼完，這題會留到錯題練習。":"✓ Correct!";setTimeout(next,650)}else{wrong.set(cur.w,cur);typed="";slots();$("wrongN").textContent=`本輪錯題 ${wrong.size}`;if(copy){$("msg").textContent="再對照答案試一次。";return}tries++;if(tries>=3){copy=true;$("answer").textContent=cur.w;$("answerBox").style.display="block";$("msg").textContent="已錯 3 次，請看著答案再輸入一次。"}else $("msg").textContent=`✗ 再試一次（${tries}/3）`}}
+function next(){i++;i<q.length?show():finish()}
+function finish(){speechSynthesis.cancel();$("game").style.display="none";$("result").style.display="block";if(!wrong.size){$("rtitle").textContent="🎉 All Clear!";$("rtext").textContent="這一輪全部拼對了！";$("wrongList").style.display="none";$("again").style.display="none"}else{$("rtitle").textContent="🌱 錯題練習";$("rtext").textContent=`有 ${wrong.size} 個單字需要再練一次。`;$("wrongList").style.display="block";$("wrongList").innerHTML=[...wrong.values()].map(x=>`<b>${x.w}</b>｜${x.zh}`).join("<br>");$("again").style.display="inline-block";$("again").textContent=`只練這 ${wrong.size} 題`}}
+function start(a,l){q=shuffle(a);i=0;round=1;wrong=new Map();label=l;$("home").style.display="none";$("result").style.display="none";$("game").style.display="block";show()}
+for(let n=1;n<=8;n++){let lab=document.createElement("label");lab.className="check";lab.innerHTML=`<input type="checkbox" value="${n}"> Lesson ${n}`;$("checks").appendChild(lab)}
+for(let n=1;n<=80;n++){let o=document.createElement("option");o.value=n;o.textContent=n+" 題";if(n===20)o.selected=true;$("count").appendChild(o)}
+$("all").onclick=()=>document.querySelectorAll("#checks input").forEach(x=>x.checked=true);
+$("none").onclick=()=>document.querySelectorAll("#checks input").forEach(x=>x.checked=false);
+$("startBtn").onclick=()=>{let selected=[...document.querySelectorAll("#checks input:checked")].map(x=>x.value);if(!selected.length){alert("請至少選擇一個 Lesson 喔！");return}let pool=selected.flatMap(n=>lessons[n]);let n=Math.min(+$("count").value,pool.length);start(shuffle(pool).slice(0,n),selected.length===1?`Lesson ${selected[0]}`:`Lesson ${selected.join("、")}`)};
+["QWERTYUIOP","ASDFGHJKL","ZXCVBNM"].forEach(r=>{let row=document.createElement("div");row.className="keyrow";[...r].forEach(c=>{let b=document.createElement("button");b.className="key";b.textContent=c;b.onclick=()=>add(c);row.appendChild(b)});$("keyboard").appendChild(row)});
+$("listen").onclick=speak;$("del").onclick=()=>{typed=typed.slice(0,-1);slots()};$("submit").onclick=submit;
+$("again").onclick=()=>{q=shuffle([...wrong.values()]);wrong=new Map();i=0;round++;$("result").style.display="none";$("game").style.display="block";show()};
+$("homeBtn").onclick=()=>{speechSynthesis.cancel();$("result").style.display="none";$("game").style.display="none";$("home").style.display="block"};
+document.addEventListener("keydown",e=>{if($("game").style.display==="block"){if(/^[a-zA-Z]$/.test(e.key))add(e.key);else if(e.key==="Backspace")$("del").click();else if(e.key==="Enter")submit()}});
+</script></body></html>
