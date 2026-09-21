@@ -1,1 +1,61 @@
-a
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Unit 6 Reading Practice</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef6f1;color:#17352d;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif}
+header{background:#32715e;color:#fff;padding:16px 20px}header h1{margin:0;font-size:clamp(25px,4vw,38px)}header div{opacity:.9;margin-top:3px}
+main{max-width:1050px;margin:auto;padding:18px}.card{background:#fff;border-radius:22px;padding:clamp(20px,4vw,38px);box-shadow:0 8px 30px #0001}
+.selects{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}select{font-size:17px;padding:10px;border-radius:10px;border:1px solid #b7c9c2;background:#fff;max-width:100%}
+.meta{font-size:16px;color:#617a71;margin-bottom:8px}.section{font-size:21px;font-weight:750;color:#32715e;margin-bottom:14px}
+.en{font-family:Georgia,serif;font-size:clamp(29px,5vw,48px);line-height:1.6}.zh{margin-top:22px;padding:17px 19px;border-radius:14px;background:#f3f5f4;font-size:clamp(21px,3.2vw,29px);line-height:1.6;color:#345}.zh.speaking{background:#fff2bd;color:#222}
+.controls{display:flex;gap:9px;justify-content:center;margin-top:14px;flex-wrap:nowrap}.controls.row button{flex:0 1 auto}.options{display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:18px}.autoplay{font-size:17px;font-weight:650;display:flex;align-items:center;gap:7px}.autoplay input{width:20px;height:20px}button{border:0;border-radius:13px;padding:12px 17px;font-size:17px;font-weight:700;background:#32715e;color:white}button.secondary{background:#738b83}
+.speedbox{display:flex;flex-direction:column;gap:10px}.speed{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:0}input{width:170px}.hint{text-align:center;color:#71837d;font-size:13px;margin-top:12px}
+</style></head><body><header><h1>Unit 6｜Reading Practice</h1><div>英文慢速朗讀 → 中文翻譯 → 自動下一句</div></header>
+<main><div class="card">
+<div class="selects"><select id="lesson"></select><select id="section"></select></div>
+<div class="meta" id="meta"></div><div class="section" id="stitle"></div>
+<div class="en" id="en"></div><div class="zh" id="zh"></div>
+<div class="controls row">
+<button id="play">▶ 開始朗讀</button><button class="secondary" id="pause">⏸ 暫停</button><button class="secondary" id="replay">↻ 重播本句</button>
+</div>
+<div class="controls row">
+<button class="secondary" id="prevSent">← 上一句</button><button class="secondary" id="nextSent">下一句 →</button><button class="secondary" id="prevSec">⇤ 上一段</button><button class="secondary" id="nextSec">下一段 ⇥</button>
+</div>
+<div class="options">
+<label class="autoplay"><input id="autoplay" type="checkbox" checked> 自動播放下一句</label>
+<div class="speedbox">
+<div class="speed">英文速度 <input id="rate" type="range" min=".55" max="1" step=".05" value=".7"><span id="rv">0.70×</span></div>
+<div class="speed">中文速度 <input id="zhRate" type="range" min=".8" max="1.5" step=".05" value="1.25"><span id="zhrv">1.25×</span></div>
+</div>
+</div>
+<div class="hint">每張課本照片視為一段；到段落最後一句會自動進入下一段。</div>
+</div></main>
+<script>
+const lessons=[{"title": "Lesson 1｜Adaptations & Survival", "sections": [{"title": "How do living things adapt to survive?", "sentences": [["Living things have adaptations to help them stay alive, or survive.", "生物具有適應特徵，能幫助牠們維持生命，也就是生存下來。"], ["An adaptation is a trait that helps an organism survive, find mates, or reproduce.", "適應特徵是一種能幫助生物生存、找到配偶或繁殖的特徵。"]]}, {"title": "Adaptations and Advantages", "sentences": [["Individuals of the same kind may have different traits that provide advantages.", "同一種類的個體可能具有不同的特徵，而這些特徵能帶來優勢。"], ["A saguaro cactus with more arms can produce more offspring.", "擁有較多分枝的巨人柱仙人掌可以產生更多後代。"]]}, {"title": "Survival in Different Habitats", "sentences": [["Each kind of living thing is adapted to live in a certain kind of place.", "每一種生物都具有適合生活在特定環境中的適應特徵。"], ["For example, some kinds of plants that grow in cold parts of Earth are covered with hairs.", "例如，有些生長在地球寒冷地區的植物表面覆蓋著細毛。"], ["The hairs help keep them warm.", "這些細毛能幫助植物保持溫暖。"], ["A sandfish lizard, a desert animal, digs holes in the sand to avoid predators.", "沙魚蜥是一種沙漠動物，牠會在沙中挖洞來躲避掠食者。"], ["The lizard would not survive in the Arctic because there is no sand there.", "這種蜥蜴無法在北極生存，因為那裡沒有沙子。"]]}, {"title": "Differences Can Help Living Things", "sentences": [["A species is a group of living things of the same kind.", "物種是由同一種類的生物所組成的群體。"], ["Each kind of animal and plant is a separate species.", "每一種動物和植物都是不同的物種。"], ["Individuals of the same species may have different traits, or adaptations, that help them survive and reproduce.", "同一物種的個體可能具有不同的特徵，也就是適應特徵，這些特徵能幫助牠們生存與繁殖。"], ["An individual is more likely to have offspring when it has traits that make it better able to attract mates.", "當一個個體具有更能吸引配偶的特徵時，牠就更有可能產生後代。"], ["Finding mates is one way a species can survive.", "找到配偶是讓一個物種得以延續生存的方式之一。"], ["For example, male widowbirds with longer tails attract more females for mating than male widowbirds with shorter tails.", "例如，尾巴較長的雄性寡婦鳥，比尾巴較短的雄性寡婦鳥能吸引更多雌鳥交配。"]]}]}];let li=0,si=0,qi=0,running=false,paused=false,token=0;
+const L=document.getElementById('lesson'),S=document.getElementById('section'),EN=document.getElementById('en'),ZH=document.getElementById('zh'),M=document.getElementById('meta'),ST=document.getElementById('stitle'),rate=document.getElementById('rate'),rv=document.getElementById('rv'),zhRate=document.getElementById('zhRate'),zhrv=document.getElementById('zhrv'),autoplay=document.getElementById('autoplay');
+const savedEn=localStorage.getItem('oscarScienceEnRate'),savedZh=localStorage.getItem('oscarScienceZhRate');
+if(savedEn)rate.value=savedEn;if(savedZh)zhRate.value=savedZh;
+function showRates(){rv.textContent=Number(rate.value).toFixed(2)+'×';zhrv.textContent=Number(zhRate.value).toFixed(2)+'×'}
+rate.oninput=()=>{showRates();localStorage.setItem('oscarScienceEnRate',rate.value)};
+zhRate.oninput=()=>{showRates();localStorage.setItem('oscarScienceZhRate',zhRate.value)};
+showRates();
+function fillLessons(){L.innerHTML=lessons.map((x,i)=>`<option value="${i}">${x.title}</option>`).join('')+`<option disabled>Lesson 2｜Coming Soon</option><option disabled>Lesson 3｜Coming Soon</option>`;L.value=li}
+function fillSections(){S.innerHTML=lessons[li].sections.map((x,i)=>`<option value="${i}">第 ${i+1} 段｜${x.title}</option>`).join('');S.value=si}
+function cur(){return lessons[li].sections[si].sentences[qi]}
+function render(){let sec=lessons[li].sections[si];let q=cur();M.textContent=`Lesson ${li+1} / ${lessons.length}　｜　第 ${si+1} / ${lessons[li].sections.length} 段　｜　第 ${qi+1} / ${sec.sentences.length} 句`;ST.textContent=sec.title;EN.textContent=q[0];ZH.textContent=q[1];ZH.classList.remove('speaking');L.value=li;S.value=si}
+function voice(lang){let v=speechSynthesis.getVoices();if(lang==='en-US')return v.find(x=>x.lang==='en-US'&&/Samantha|Ava|Google US English/i.test(x.name))||v.find(x=>x.lang.startsWith('en-US'))||v.find(x=>x.lang.startsWith('en'));return v.find(x=>x.lang==='zh-TW')||v.find(x=>x.lang.startsWith('zh'))}
+function speak(txt,lang,r){return new Promise(resolve=>{let u=new SpeechSynthesisUtterance(txt);u.lang=lang;u.rate=r;let v=voice(lang);if(v)u.voice=v;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u)})}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function advance(){let sec=lessons[li].sections[si];if(qi<sec.sentences.length-1){qi++;return true}qi=0;if(si<lessons[li].sections.length-1){si++;fillSections();return true}si=0;if(li<lessons.length-1){li++;fillLessons();fillSections();return true}return false}
+async function run(){if(running&&paused){speechSynthesis.resume();paused=false;return}if(running)return;running=true;paused=false;let my=++token;while(running&&my===token){render();await speak(cur()[0],'en-US',+rate.value);if(!running||my!==token)break;await wait(600);ZH.classList.add('speaking');await speak(cur()[1],'zh-TW',Number(zhRate.value));ZH.classList.remove('speaking');if(!running||my!==token)break;await wait(550);if(!autoplay.checked){running=false;break}if(!advance()){running=false;break}}}
+function stop(){speechSynthesis.cancel();token++;running=false;paused=false}
+function jumpAndPlay(){stop();render();setTimeout(run,120)}
+function moveSentence(d){if(d<0){if(qi>0)qi--;else if(si>0){si--;qi=lessons[li].sections[si].sentences.length-1;fillSections()}else if(li>0){li--;si=lessons[li].sections.length-1;qi=lessons[li].sections[si].sentences.length-1;fillLessons();fillSections()}}else{advance()}jumpAndPlay()}
+function moveSection(d){if(d<0){if(si>0)si--;else if(li>0){li--;si=lessons[li].sections.length-1;fillLessons()}}else{if(si<lessons[li].sections.length-1)si++;else if(li<lessons.length-1){li++;si=0;fillLessons()}}qi=0;fillSections();jumpAndPlay()}
+L.onchange=()=>{stop();li=+L.value;si=0;qi=0;fillSections();render()};S.onchange=()=>{stop();si=+S.value;qi=0;render()};
+document.getElementById('play').onclick=run;document.getElementById('pause').onclick=()=>{if(!running)return;if(paused){speechSynthesis.resume();paused=false}else{speechSynthesis.pause();paused=true}};
+document.getElementById('prevSent').onclick=()=>moveSentence(-1);document.getElementById('nextSent').onclick=()=>moveSentence(1);
+document.getElementById('prevSec').onclick=()=>moveSection(-1);document.getElementById('nextSec').onclick=()=>moveSection(1);
+document.getElementById('replay').onclick=jumpAndPlay;
+fillLessons();fillSections();render();
+</script></body></html>
