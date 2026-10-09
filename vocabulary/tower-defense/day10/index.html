@@ -1,0 +1,120 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Oscar 單字塔防｜第10天</title>
+<style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;background:#eef4e7;color:#293b31;overflow:hidden}#game{height:100vh;display:flex;flex-direction:column;max-width:1050px;margin:auto;background:#fff9e9}header{height:60px;padding:9px 15px;display:flex;align-items:center;background:#fffdf7;border-bottom:2px solid #e5d7b3;font-weight:900;font-size:19px}.stats{margin-left:auto;display:flex;gap:10px}.pill{background:#f1e8cf;padding:7px 11px;border-radius:99px}#field{position:relative;flex:1;min-height:250px;overflow:hidden;background:#83ad6d}.path{position:absolute;left:-5%;top:45%;width:110%;height:30%;background:#d8bd85;border-block:7px solid #efddb2;transform:rotate(-4deg)}.tower{position:absolute;left:9%;top:34%;font-size:70px}.base{position:absolute;right:3%;top:39%;width:92px;height:115px;border:5px solid #806344;border-radius:15px;background:#f3dda1;text-align:center;padding-top:58px;font-weight:900}.base:before{content:"303";position:absolute;top:14px;left:16px;right:16px;padding:5px;background:#567b62;color:white;border-radius:7px}.enemy{position:absolute;top:52%;left:-60px;font-size:50px;transition:left .2s linear,transform .1s}.enemy.hit{transform:scale(.7)}.wave{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#fff8d8;padding:7px 14px;border-radius:99px;font-weight:900}.shot{position:absolute;width:13px;height:13px;border-radius:50%;background:#fff29a;box-shadow:0 0 12px white;transition:all .2s linear}#panel{height:255px;padding:12px 16px;display:grid;grid-template-columns:1fr 1.2fr;gap:15px;background:#fffdf7;border-top:3px solid #dfd0a9}.clue{display:flex;flex-direction:column;justify-content:center;align-items:center;background:#f4ecd8;border-radius:19px}.zh{font-size:26px;font-weight:950}.clue button{margin-top:8px;border:0;border-radius:99px;background:white;padding:8px 13px;font-size:17px}.spell{display:flex;flex-direction:column;justify-content:center;align-items:center}.slots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:7px}.slot{width:29px;height:38px;border-bottom:4px solid #58705f;text-align:center;font-size:25px;font-weight:950;text-transform:uppercase}.keyboard{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;width:100%;max-width:570px}.key{border:2px solid #d8c8a2;background:white;border-radius:8px;padding:7px 2px;font-weight:850}.msg{height:24px;font-weight:850;color:#8b5945}
+.account{font-size:12px;font-weight:800;white-space:nowrap}
+.saveState{position:absolute;right:10px;bottom:8px;background:#fff9dddc;padding:5px 9px;border-radius:99px;font-size:12px;font-weight:850;z-index:4}
+.loginInput{width:100%;padding:11px 12px;margin:5px 0;border:2px solid #dfd0a9;border-radius:11px;font-size:16px}
+.loginError{min-height:22px;color:#a44;font-weight:800;font-size:13px;margin-top:5px}#overlay{position:fixed;inset:0;background:#20352abb;display:flex;align-items:center;justify-content:center;z-index:20;padding:20px}.card{max-width:490px;background:#fffaf0;border-radius:26px;padding:27px;text-align:center;box-shadow:0 18px 60px #0005}.card p{line-height:1.7}.main{border:0;background:#5f9474;color:white;font-weight:950;font-size:18px;border-radius:14px;padding:12px 22px}.hide{display:none!important}@media(max-width:700px){header{height:53px;font-size:14px;padding:6px}.pill{padding:5px 7px}#panel{height:290px;grid-template-columns:1fr;gap:6px;padding:7px}.clue{padding:5px}.zh{font-size:20px}.clue button{margin-top:3px;padding:5px 9px}.slots{margin:2px}.slot{width:24px;height:30px;font-size:20px}.keyboard{gap:3px}.key{padding:5px 1px;font-size:13px}.tower{font-size:55px}.enemy{font-size:42px}.base{width:75px;height:92px;padding-top:47px}}</style></head>
+<body><div id="game"><header>🏰 Oscar 單字塔防<div class="stats"><div class="account" id="account">☁️ 檢查登入中…</div><div class="pill">❤️ <span id="hearts">3</span></div><div class="pill">⭐ <span id="done">0</span>/10</div></div></header><div id="field"><div class="path"></div><div class="wave" id="wave">第 1 波</div><div class="tower">🏹</div><div class="base">基地</div><div class="enemy" id="enemy">👾</div><div class="saveState" id="saveState">☁️ 尚未連線</div></div><div id="panel"><div class="clue"><div>請拼出：</div><div class="zh" id="zh"></div><button id="speak">🔊 聽英文發音</button></div><div class="spell"><div class="msg" id="msg"></div><div class="slots" id="slots"></div><div class="keyboard" id="keyboard"></div></div></div></div>
+<div id="overlay"><div class="card"><h1>🏰 單字塔防</h1><p>怪物正朝 303 基地前進！<br><b>每拼對一個字母，防禦塔就射擊一次。</b><br>拼錯時怪物會往前走；完整拼對單字，就能擊退這一波。</p><button class="main" id="start">開始防守！</button></div></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyDY7OHoyjhiN0bZ-wdbNbKfaQOt8Mg0gGY",
+ authDomain:"oscar-pumpkin.firebaseapp.com",
+ projectId:"oscar-pumpkin",
+ storageBucket:"oscar-pumpkin.firebasestorage.app",
+ messagingSenderId:"135601810754",
+ appId:"1:135601810754:web:adedc0cbe7cac61c11ecdb"
+};
+const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app);
+await setPersistence(auth,browserLocalPersistence).catch(()=>{});
+let cloudUser=null, cloudReady=false, attempts=0, mistakes=0;
+const progressRef=()=>cloudUser?doc(db,"users",cloudUser.uid,"games","towerDefense_day10"):null;
+async function saveCloud(extra={}){
+ if(!cloudUser)return;
+ const r=progressRef(); document.getElementById("saveState").textContent="☁️ 儲存中…";
+ try{
+  await setDoc(r,{day:10,game:"towerDefense",wave:wi+1,completedWords:wi,hearts,letterPosition:pos,
+   currentWord:wi<words.length?words[wi][0]:"",attempts,mistakes,completed:wi>=words.length,
+   updatedAt:serverTimestamp(),...extra},{merge:true});
+  document.getElementById("saveState").textContent="☁️ 已雲端儲存";
+ }catch(e){document.getElementById("saveState").textContent="⚠️ 雲端儲存失敗";console.error(e)}
+}
+async function loadCloud(){
+ if(!cloudUser)return;
+ try{
+  const snap=await getDoc(progressRef());
+  if(snap.exists()){
+   const d=snap.data();
+   if(!d.completed){
+    wi=Math.max(0,Math.min(9,d.completedWords||0)); hearts=Math.max(1,d.hearts||3);
+    document.getElementById("done").textContent=wi; document.getElementById("hearts").textContent=hearts;
+   }
+  }
+  cloudReady=true; document.getElementById("saveState").textContent="☁️ 已連上你的存檔";
+ }catch(e){document.getElementById("saveState").textContent="⚠️ 無法讀取存檔";console.error(e)}
+}
+function friendlyAuthError(e){
+ const c=e?.code||"";
+ if(c.includes("email-already-in-use")) return "這個 Email 已經註冊過了，請直接登入。";
+ if(c.includes("weak-password")) return "密碼太短，請至少使用 6 個字元。";
+ if(c.includes("invalid-email")) return "Email 格式不正確。";
+ if(c.includes("invalid-credential")) return "Email 或密碼不正確。";
+ if(c.includes("too-many-requests")) return "嘗試次數太多，請稍後再試。";
+ return "目前無法完成，請稍後再試。";
+}
+function loginCard(mode="login"){
+ document.getElementById("overlay").classList.remove("hide");
+ const isRegister=mode==="register";
+ document.getElementById("overlay").innerHTML=`<div class="card">
+ <h1>🎃 ${isRegister?"建立南瓜田帳號":"歡迎回到南瓜田"}</h1>
+ <p>${isRegister?"帳號建立後，這台裝置會保持登入；換裝置時也能接回自己的進度。":"登入後會自動讀取你自己的遊戲進度。"}</p>
+ ${isRegister?'<input class="loginInput" id="displayName" maxlength="20" autocomplete="nickname" placeholder="暱稱（例如 Oscar）">':""}
+ <input class="loginInput" id="loginEmail" type="email" autocomplete="username" placeholder="Email">
+ <input class="loginInput" id="loginPassword" type="password" autocomplete="${isRegister?"new-password":"current-password"}" placeholder="密碼（至少 6 個字元）">
+ <div class="loginError" id="loginError"></div>
+ <button class="main" id="loginBtn">${isRegister?"建立帳號":"登入"}</button>
+ <p style="margin:14px 0 0;font-size:14px">${isRegister?'已經有帳號？ <button id="switchMode" style="border:0;background:none;text-decoration:underline;font-weight:900;cursor:pointer">回登入</button>':'第一次來？ <button id="switchMode" style="border:0;background:none;text-decoration:underline;font-weight:900;cursor:pointer">建立新帳號</button>'}</p>
+ ${!isRegister?'<p style="margin:8px 0 0"><button id="forgotBtn" style="border:0;background:none;text-decoration:underline;cursor:pointer">忘記密碼</button></p>':""}
+ </div>`;
+ document.getElementById("switchMode").onclick=()=>loginCard(isRegister?"login":"register");
+ if(!isRegister){
+  document.getElementById("forgotBtn").onclick=async()=>{
+   const email=document.getElementById("loginEmail").value.trim();
+   const err=document.getElementById("loginError");
+   if(!email){err.textContent="先輸入註冊時使用的 Email。";return}
+   try{await sendPasswordResetEmail(auth,email);err.textContent="重設密碼信已寄出，請到信箱查看。"}
+   catch(e){err.textContent=friendlyAuthError(e)}
+  };
+ }
+ document.getElementById("loginBtn").onclick=async()=>{
+  const b=document.getElementById("loginBtn"),err=document.getElementById("loginError");
+  const email=document.getElementById("loginEmail").value.trim();
+  const password=document.getElementById("loginPassword").value;
+  b.disabled=true;err.textContent=isRegister?"建立中…":"登入中…";
+  try{
+   if(isRegister){
+    const name=document.getElementById("displayName").value.trim();
+    if(!name){throw {code:"missing-name"}}
+    const cred=await createUserWithEmailAndPassword(auth,email,password);
+    await updateProfile(cred.user,{displayName:name});
+    await setDoc(doc(db,"users",cred.user.uid),{
+      displayName:name,email:email,createdAt:serverTimestamp(),updatedAt:serverTimestamp()
+    },{merge:true});
+   }else{
+    await signInWithEmailAndPassword(auth,email,password);
+   }
+  }catch(e){
+   err.textContent=e?.code==="missing-name"?"請先輸入暱稱。":friendlyAuthError(e);
+   b.disabled=false;
+  }
+ };
+}
+onAuthStateChanged(auth,async user=>{
+ if(!user){
+  cloudUser=null;cloudReady=false;
+  document.getElementById("account").textContent="未登入";
+  loginCard("login");return
+ }
+ cloudUser=user;
+ const name=user.displayName||user.email?.split("@")[0]||"玩家";
+ document.getElementById("account").innerHTML=`☁️ ${name}　<button id="logoutBtn" style="border:0;background:none;text-decoration:underline;font-size:12px;cursor:pointer">登出</button>`;
+ document.getElementById("logoutBtn").onclick=()=>signOut(auth);
+ await loadCloud();
+ document.getElementById("overlay").innerHTML=`<div class="card"><h1>🏰 單字塔防</h1><p>${name}，怪物正朝 303 基地前進！<br><b>每拼對一個字母，防禦塔就射擊一次。</b><br>你的進度會自動存到自己的南瓜田帳號。</p><button class="main" id="start">開始防守！</button></div>`;
+ document.getElementById("start").onclick=()=>{document.getElementById("overlay").classList.add("hide");setup()};
+});
+const words=[["ordinary","普通的；平常的"],["control","控制；掌控"],["cage","籠子"],["upset","難過的；心煩的"],["sensible","明智的；合理的"],["confused","困惑的"],["training","訓練"],["suspiciously","可疑地"],["patience","耐心"],["trust","信任；相信"]];let wi=0,pos=0,hearts=3,enemyX=2,locked=false;const $=x=>document.getElementById(x),enemy=$("enemy"),field=$("field");function setup(){if(wi>=words.length)return win();pos=0;enemyX=2;locked=false;enemy.style.left="-60px";setTimeout(()=>enemy.style.left=enemyX+"%",80);$("wave").textContent=`第 ${wi+1} 波`;$("zh").textContent=words[wi][1];$("msg").textContent="";$("slots").innerHTML=[...words[wi][0]].map((_,i)=>`<div class="slot" id="s${i}"></div>`).join("")}function shoot(){let s=document.createElement("div");s.className="shot";s.style.left="15%";s.style.top="52%";field.appendChild(s);requestAnimationFrame(()=>{s.style.left=(enemyX+2)+"%";s.style.top="58%"});setTimeout(()=>s.remove(),230);enemy.classList.add("hit");setTimeout(()=>enemy.classList.remove("hit"),120)}function press(ch){if(locked)return;attempts++;let w=words[wi][0];if(ch===w[pos]){$("s"+pos).textContent=ch;pos++;shoot();$("msg").textContent="命中！ 🎯";saveCloud();if(pos===w.length){locked=true;$("msg").textContent=w+"！擊退成功 ✨";enemy.style.left="-80px";wi++;$("done").textContent=wi;saveCloud({completedWords:wi});setTimeout(setup,750)}}else{mistakes++;enemyX+=8;$("msg").textContent="拼錯了，怪物前進！";enemy.style.left=enemyX+"%";if(enemyX>=82){hearts--;$("hearts").textContent=hearts;saveCloud();locked=true;if(hearts<=0)setTimeout(lose,450);else setTimeout(setup,650)}}}"QWERTYUIOPASDFGHJKLZXCVBNM".split("").forEach(c=>{let b=document.createElement("button");b.className="key";b.textContent=c;b.onclick=()=>press(c.toLowerCase());$("keyboard").appendChild(b)});document.addEventListener("keydown",e=>{/^[a-zA-Z]$/.test(e.key)&&press(e.key.toLowerCase())});$("speak").onclick=()=>{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(words[wi][0]);u.lang="en-US";u.rate=.78;speechSynthesis.speak(u)};function win(){saveCloud({completed:true,completedWords:10});$("overlay").classList.remove("hide");$("overlay").innerHTML='<div class="card"><h1>🎉 303 守住了！</h1><p>你成功拼完今天的 10 個單字，所有怪物都被擊退了！</p><button class="main" onclick="location.reload()">再玩一次</button></div>'}function lose(){saveCloud({completed:false});$("overlay").classList.remove("hide");$("overlay").innerHTML='<div class="card"><h1>💥 基地需要支援！</h1><p>差一點！再試一次，把單字拼得更熟吧。</p><button class="main" onclick="location.reload()">重新挑戰</button></div>'}</script></body></html>
