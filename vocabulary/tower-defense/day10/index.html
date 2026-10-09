@@ -48,13 +48,20 @@ async function loadCloud(){
  }catch(e){document.getElementById("saveState").textContent="⚠️ 無法讀取存檔";console.error(e)}
 }
 function friendlyAuthError(e){
- const c=e?.code||"";
- if(c.includes("email-already-in-use")) return "這個 Email 已經註冊過了，請直接登入。";
- if(c.includes("weak-password")) return "密碼太短，請至少使用 6 個字元。";
- if(c.includes("invalid-email")) return "Email 格式不正確。";
- if(c.includes("invalid-credential")) return "Email 或密碼不正確。";
- if(c.includes("too-many-requests")) return "嘗試次數太多，請稍後再試。";
- return "目前無法完成，請稍後再試。";
+ const c=e?.code||"unknown-error";
+ const m=e?.message||"";
+ let zh="";
+ if(c.includes("email-already-in-use")) zh="這個 Email 已經註冊過了，請直接登入。";
+ else if(c.includes("weak-password")) zh="密碼太短或強度不足。";
+ else if(c.includes("invalid-email")) zh="Email 格式不正確。";
+ else if(c.includes("invalid-credential")) zh="Email 或密碼不正確。";
+ else if(c.includes("too-many-requests")) zh="嘗試次數太多，請稍後再試。";
+ else if(c.includes("operation-not-allowed")) zh="Firebase 尚未允許這種登入／註冊方式。";
+ else if(c.includes("network-request-failed")) zh="網路連線失敗。";
+ else if(c.includes("invalid-api-key")) zh="Firebase API Key 無效。";
+ else if(c.includes("unauthorized-domain")) zh="目前這個網站網域尚未被 Firebase 授權。";
+ else zh="Firebase 回傳了錯誤。";
+ return `${zh}<br><small style="display:block;margin-top:8px;word-break:break-all">錯誤代碼：${c}<br>${m}</small>`;
 }
 function loginCard(mode="login"){
  document.getElementById("overlay").classList.remove("hide");
@@ -77,7 +84,7 @@ function loginCard(mode="login"){
    const err=document.getElementById("loginError");
    if(!email){err.textContent="先輸入註冊時使用的 Email。";return}
    try{await sendPasswordResetEmail(auth,email);err.textContent="重設密碼信已寄出，請到信箱查看。"}
-   catch(e){err.textContent=friendlyAuthError(e)}
+   catch(e){err.innerHTML=friendlyAuthError(e)}
   };
  }
  document.getElementById("loginBtn").onclick=async()=>{
@@ -98,7 +105,7 @@ function loginCard(mode="login"){
     await signInWithEmailAndPassword(auth,email,password);
    }
   }catch(e){
-   err.textContent=e?.code==="missing-name"?"請先輸入暱稱。":friendlyAuthError(e);
+   err.innerHTML=e?.code==="missing-name"?"請先輸入暱稱。":friendlyAuthError(e);
    b.disabled=false;
   }
  };
