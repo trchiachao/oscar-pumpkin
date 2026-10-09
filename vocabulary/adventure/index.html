@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>校園探險｜Oscar的南瓜田</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;
+  color:#39291d;
+  background:linear-gradient(#f6fff9,#e5f5eb);
+}
+.wrap{
+  max-width:900px;
+  margin:auto;
+  padding:40px 20px;
+}
+.back{
+  display:inline-block;
+  margin-bottom:18px;
+  text-decoration:none;
+  color:#557663;
+  font-weight:800;
+}
+h1{
+  text-align:center;
+  font-size:38px;
+  margin:10px 0 5px;
+}
+.sub{
+  text-align:center;
+  color:#718478;
+  margin-bottom:35px;
+}
+.days{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+.day{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:180px;
+  padding:24px;
+  text-decoration:none;
+  color:#31473a;
+  background:#fff;
+  border:3px solid #7bb79a;
+  border-radius:26px;
+  box-shadow:0 10px 28px #456b5720;
+}
+.day:active{
+  transform:scale(.97);
+}
+.icon{
+  font-size:48px;
+  margin-bottom:8px;
+}
+.day h2{
+  margin:0;
+  font-size:27px;
+}
+.day p{
+  margin:7px 0 0;
+  color:#718478;
+}
+@media(max-width:650px){
+  .days{grid-template-columns:1fr 1fr}
+  h1{font-size:32px}
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <a class="back" href="../">← 回到 Vocabulary</a>
+
+  <h1>🎒 校園探險</h1>
+  <div class="sub">跟著 Oscar 出發，看看今天在學校會遇到什麼事！</div>
+
+  <div class="days">
+
+    <a class="day" href="./day10/">
+      <div class="icon">⭐</div>
+      <h2>第10天</h2>
+      <p>開始今天的校園冒險</p>
+    </a>
+
+  </div>
+
+</div>
+</body>
+</html>
